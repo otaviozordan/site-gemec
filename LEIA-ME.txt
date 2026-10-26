@@ -1,0 +1,133 @@
+ATUALIZAR O SITE DO GEMEC A PARTIR DO LATTES
+=============================================
+
+O que faz: baixa o Curriculo Lattes de cada membro cadastrado no site
+(gemec.unifei.edu.br), gera o relatorio com o scriptLattes e envia ao site as
+biografias, as publicacoes (refeitas do zero) e a pagina Estatisticas.
+
+Tem que rodar num PC com navegador: o Lattes usa reCAPTCHA e so libera o CV
+para um Chrome de verdade. O servidor do site nao consegue fazer isso.
+
+
+PRECISA TER NO PC
+-----------------
+- Python 3.10 ou mais novo (Anaconda serve).
+- Google Chrome instalado (o Selenium baixa o chromedriver sozinho).
+- Internet.
+- Usuario e senha do WordPress do GEMEC: o app pede na primeira vez que abre
+  neste PC e grava em config.json, nesta pasta (fica so aqui, fora do git).
+  Para trocar depois, use Configuracoes; la tambem da para trocar a senha no
+  site.
+
+
+COMO USAR
+---------
+0 - Instalar (uma vez).bat
+      Instala as bibliotecas do Python. So na primeira vez em cada PC.
+
+1 - Abrir o app.bat
+      Abre o app "GEMEC - Painel do site". Ao abrir, ele le do site tudo o
+      que o painel do WordPress controla (botao Sincronizar le de novo). Nele:
+
+      Abas
+        Conteudo do site       membros, linhas de pesquisa, publicacoes,
+                               oportunidades, parceiros e paginas: adicionar,
+                               editar, trocar foto/logo, enviar PDF do edital,
+                               mudar situacao (publicado, rascunho, oculto) e
+                               mandar para a lixeira. Salvar grava direto no
+                               site. Com Ctrl/Shift selecione varios para mudar
+                               todos de uma vez (ex.: ocultar publicacoes,
+                               passar membros para Egressos).
+                               No cadastro do membro: "Preencher pelo Lattes"
+                               (nome, formacao, ORCID, temas, foto nos campos
+                               vazios), "Importar foto do Lattes" e "Buscar no
+                               ORCID / OpenAlex" (pelo nome ou ORCID, como no
+                               Altimetro). Membro novo salvo: o app oferece
+                               trazer as publicacoes dele na hora.
+        Ultimas atualizacoes   cada envio ao site e o que mudou nele:
+                               publicacoes novas e removidas, membros que
+                               entraram ou sairam, curriculos atualizados no
+                               Lattes e os totais (orientacoes, projetos...)
+        Curriculos no Lattes   quando cada membro atualizou o Lattes (verde:
+                               ultimos 30 dias). Duplo clique abre o CV.
+        Publicacoes recentes   tudo o que esta no site, do mais novo ao mais
+                               antigo, com busca. Duplo clique abre o DOI.
+        Registro               a saida da tarefa que esta rodando
+
+      Botoes
+        Atualizacao completa   baixa o CV de todos, gera o relatorio e refaz
+                               o site (uns 15 minutos; uma vez por semana)
+        Atualizar um membro... escolhe uma pessoa: baixa so o CV dela e refaz
+                               o site (os outros com o CV ja baixado). Tambem
+                               no botao do cadastro do membro e no botao
+                               direito da aba Curriculos no Lattes
+        So membros novos       so quem foi cadastrado no site e ainda nao tem
+                               CV (se a completa tiver mais de 7 dias, faz a
+                               completa); sem nada novo, termina na hora
+        Completar perfis       preenche campos vazios dos perfis com o Lattes
+        Ver quem falta         membros sem CV baixado
+        Abrir CVs que faltam   abre no navegador, para salvar a mao
+
+      O historico fica em historico/ (historico.json) e a saida de cada tarefa
+      em historico/registros/.
+
+Pelo terminal (o app chama o mesmo main.py):
+    python main.py           atualizacao completa
+    python main.py novos     so membros novos
+    python main.py membro <id16 do Lattes>   so um membro
+    python main.py perfis    so completa os perfis com o Lattes
+    python main.py faltam    quem ainda nao tem CV baixado
+    python main.py abrir     abre no navegador os CVs que faltam
+
+A atualizacao completa e a de membros novos tambem completam os perfis no
+site com o que esta no Lattes: formacao, ORCID, titulacao dos egressos, temas
+de pesquisa e foto. So preenchem campo VAZIO; o que alguem escreveu no painel
+nao e tocado.
+
+
+PESQUISADORES SEM LATTES (ESTRANGEIROS)
+---------------------------------------
+Cadastre no site com o ORCID e sem o link do Lattes (o app acha o ORCID em
+"Buscar no ORCID / OpenAlex"). A cada atualizacao as publicacoes dele vem do
+OpenAlex, como no Altimetro: o que ja esta no Lattes de alguem so ganha o nome
+dele; o resto entra como publicacao nova. Copia em scripts/lattes/openalex/.
+Ficam fora do relatorio do scriptLattes (que e so de quem tem Lattes).
+
+
+QUANDO UM CV NAO BAIXA
+----------------------
+- Quem falhar fica com a copia anterior (pasta scripts/lattes/cache/), entao
+  o site nao perde nada.
+- Confira o link do Lattes no cadastro do membro no site (16 digitos).
+- Plano B, a mao: "python main.py abrir" abre no navegador os CVs que
+  faltam. Salve cada um com Ctrl+S, tipo "Pagina da Web, somente HTML", em
+  scripts/lattes/baixados/ (o nome do arquivo tanto faz). Depois rode a
+  atualizacao de novo.
+
+
+O QUE TEM NA PASTA
+------------------
+app.py                     o app (o que o .bat 1 abre)
+marca/                     logo e icone do GEMEC usados no app
+scripts/conteudo.py        leitura e gravacao do conteudo do site (aba
+                           Conteudo do site); os campos espelham os plugins
+scripts/acesso.py          usuario e senha (config.json)
+scripts/busca.py           busca no ORCID e no OpenAlex
+scripts/lattes/estrangeiros.py   publicacoes do OpenAlex de quem nao tem Lattes
+main.py                    as tarefas (o app e o terminal chamam ele)
+scripts/historico.py       registra o que mudou a cada envio ao site
+historico/                 historico das atualizacoes e registros das tarefas
+scripts/perfis.py          completa os perfis com o Lattes
+scripts/lattes/lattes.py   baixar, gerar e enviar (o trabalho de verdade)
+scripts/lattes/extrair.py  publicacoes e coautores para o site
+scripts/lattes/relatorio_json.py   dados da pagina Estatisticas
+scripts/lattes/scriptLattes/       o scriptLattes (Mena-Chalco & Cesar-Jr.)
+scripts/lattes/cache/      ultimo CV baixado de cada membro
+scripts/gm.py              login e envio ao WordPress
+scripts/dados.py           lista de membros de reserva (se o site nao responder)
+scripts/bundle.pem         certificado do servidor (ele nao manda o intermediario)
+plugins/gemec-lattes/      plugin do site; sobe de novo a cada envio com o
+                           relatorio novo
+
+A lista de membros vem do proprio site: cadastrou la com o link do Lattes,
+entra na proxima atualizacao. Nao precisa mexer em nada aqui.

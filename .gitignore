@@ -1,0 +1,31 @@
+# Login do WordPress: o app pede na primeira vez e grava so neste PC
+config.json
+*.tmp
+
+__pycache__/
+dist/
+
+# Historico e registros das tarefas (de cada PC)
+historico/
+
+# Curriculos baixados e tudo o que e gerado a partir deles
+scripts/lattes/cache/
+scripts/lattes/baixados/
+scripts/lattes/saida/
+scripts/lattes/openalex/
+scripts/lattes/_baixando/
+scripts/lattes/_saida_site/
+scripts/lattes/site.json
+scripts/lattes/nomes.json
+scripts/lattes/gemec.list
+scripts/lattes/gemec-site.list
+scripts/lattes/gemec.config
+scripts/lattes/gemec-site.config
+scripts/lattes/termos.txt
+scripts/lattes/ultima_semanal.txt
+
+# Relatorio gerado (sobe com o plugin a cada envio)
+plugins/gemec-lattes/relatorio/
+plugins/gemec-lattes/relatorio.json
+plugins/gemec-lattes/relatorio.txt
+plugins/gemec-lattes/listas.json
